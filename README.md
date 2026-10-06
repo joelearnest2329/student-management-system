@@ -14,3 +14,7 @@ Campusly is a Node.js student management app with MongoDB-backed accounts, stude
 The included `render.yaml` defines the web service. Create a MongoDB database on MongoDB Atlas, then create a Render Blueprint from this repository. Set `MONGODB_URI` in the Render service environment to the Atlas connection string; do not commit that value or put it in `render.yaml`. Allow the Render service to reach the Atlas cluster in Atlas Network Access. Once the deployment is healthy, open its Render URL and register an account.
 
 The local `.data` folder and `.env` file are excluded from Git. Production data is stored in the configured MongoDB database.
+
+## GitHub Pages preview
+
+GitHub Pages publishes a read-only UI preview with sample data; it cannot run this app's Node.js API or MongoDB backend. The `Deploy GitHub Pages` workflow publishes the frontend whenever changes are pushed to `main`. In the repository settings, set **Pages → Build and deployment → Source** to **GitHub Actions**. After the workflow succeeds, the preview is available at `https://joelearnest2329.github.io/student-management-system/`.

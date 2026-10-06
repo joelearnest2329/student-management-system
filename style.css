@@ -64,6 +64,8 @@ button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px s
 .profile-menu { display: inline-flex; width: auto; height: 34px; align-items: center; gap: 6px; margin-left: auto; padding: 0 8px; color: #c1d0c8; font-size: 10px; }
 .profile-menu svg { width: 17px; }
 .main-area { min-height: 100vh; margin-left: 248px; display: flex; flex-direction: column; }
+.preview-banner { padding: 9px 24px; background: #fbf5e7; color: #725a24; text-align: center; font-size: 11px; font-weight: 600; }
+.preview-banner[hidden] { display: none; }
 .topbar { position: sticky; top: 0; z-index: 10; display: flex; height: 66px; flex: 0 0 66px; align-items: center; justify-content: space-between; padding: 0 38px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,.93); backdrop-filter: blur(12px); }
 .menu-toggle { display: none; }
 .breadcrumbs { display: flex; align-items: center; gap: 9px; color: #98a19c; font-size: 11px; }

@@ -34,6 +34,7 @@ const viewContent = document.querySelector('#view-content');
 const sidebar = document.querySelector('#sidebar');
 const navCount = document.querySelector('#student-nav-count');
 const authRoot = document.querySelector('#auth-root');
+const previewMode = window.location.hostname.endsWith('.github.io') || new URLSearchParams(window.location.search).has('preview');
 let currentView = 'overview';
 let studentFilter = '';
 let studentPage = 1;
@@ -55,6 +56,7 @@ const studentRow = (student) => `<tr>
 </tr>`;
 
 async function apiRequest(path, options = {}) {
+	if (previewMode) throw new Error('This is a read-only preview. Backend features are unavailable.');
 	const response = await fetch(path, {
 		...options,
 		headers: { 'Content-Type': 'application/json', ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}), ...options.headers }
@@ -83,6 +85,8 @@ function renderAuth(mode = 'login', errorMessage = '') {
 function enterWorkspace(account) {
 	currentUser = account;
 	document.body.classList.remove('auth-required');
+	document.body.classList.toggle('preview-mode', previewMode);
+	document.querySelector('#preview-banner').hidden = !previewMode;
 	authRoot.innerHTML = '';
 	document.querySelector('#profile-name').textContent = account.name;
 	document.querySelector('#profile-avatar').textContent = initials(account.name);
@@ -410,6 +414,10 @@ document.addEventListener('click', (event) => {
 	if (nav) { setView(nav.dataset.view); return; }
 	const action = event.target.closest('[data-action]');
 	if (action) {
+		if (previewMode && ['add-student', 'delete-course', 'mark-all', 'save-attendance', 'delete-attendance', 'reset-data', 'logout'].includes(action.dataset.action)) {
+			showToast('This is a read-only preview. Changes are not saved.');
+			return;
+		}
 		switch (action.dataset.action) {
 			case 'add-student': openStudentModal(); break;
 			case 'close-modal': closeModal(); break;
@@ -435,6 +443,7 @@ document.addEventListener('click', (event) => {
 	const pageButton = event.target.closest('[data-page]');
 	if (pageButton && !pageButton.disabled) { studentPage = Number(pageButton.dataset.page); renderView(); }
 	const attendanceButton = event.target.closest('[data-attendance]');
+	if (attendanceButton && previewMode) { showToast('This is a read-only preview. Changes are not saved.'); return; }
 	if (attendanceButton) { attendanceRecords[attendanceButton.dataset.student] = attendanceButton.dataset.attendance; renderView(); }
 });
 
@@ -470,6 +479,11 @@ document.addEventListener('change', (event) => {
 });
 
 document.addEventListener('submit', async (event) => {
+	if (previewMode && event.target.id !== 'auth-form') {
+		event.preventDefault();
+		showToast('This is a read-only preview. Changes are not saved.');
+		return;
+	}
 	if (event.target.id === 'student-form') { event.preventDefault(); if (event.target.reportValidity()) await addStudent(event.target).catch((error) => showToast(error.message)); }
 	if (event.target.id === 'course-form') { event.preventDefault(); if (event.target.reportValidity()) await (event.target.dataset.courseCode ? updateCourse(event.target) : addCourse(event.target)).catch((error) => showToast(error.message)); }
 	if (event.target.id === 'collection-form') { event.preventDefault(); if (event.target.reportValidity()) await collectStudent(event.target).catch((error) => showToast(error.message)); }
@@ -510,6 +524,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 (async () => {
+	if (previewMode) { enterWorkspace({ name: 'Alex Morgan' }); return; }
 	if (!authToken) { renderAuth('login'); return; }
 	try {
 		const result = await apiRequest('/api/auth/me');
