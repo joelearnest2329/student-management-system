@@ -524,7 +524,7 @@ document.addEventListener('keydown', (event) => {
 });
 
 (async () => {
-	if (previewMode) { enterWorkspace({ name: 'Alex Morgan' }); return; }
+	if (previewMode) { enterWorkspace({ name: 'Joel Earnest' }); return; }
 	if (!authToken) { renderAuth('login'); return; }
 	try {
 		const result = await apiRequest('/api/auth/me');
